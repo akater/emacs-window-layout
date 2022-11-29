@@ -1,4 +1,4 @@
-;;; window-layout.el --- window layout manager
+;;; window-layout.el --- window layout manager  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2010-2017  SAKURAI Masashi
 
@@ -196,11 +196,11 @@ This function retrieves the window object from the edge position
 in current frame."
   (and (wlf:window-edges winfo)
        (cl-destructuring-bind
-           (left top right bottom) (wlf:window-edges winfo)
+           (left top _right _bottom) (wlf:window-edges winfo)
          (let ((swin (window-at (+ 2 left) (+ 2 top))))
            (and swin 
                 (cl-destructuring-bind
-                    (sl st sr sb) (window-edges swin)
+                    (sl st _sr _sb) (window-edges swin)
                   (if (and (equal left sl) (< (abs (- top st)) 3)) t
                     (message "OLD:%S  NEW:%S"
                              (wlf:window-edges winfo) (window-edges swin)) nil))
@@ -321,7 +321,7 @@ start dividing."
            (truncate (* 2 size it)))))
       (error (message "wlf:warning : %s" err)))))
 
-(defun wlf:window-shrink (window verticalp shrink-size)
+(defun wlf:window-shrink (_window verticalp shrink-size)
   "[internal] Shrink window size."
   (cond
    (verticalp
@@ -462,7 +462,7 @@ Return a cons cell, car is width and cdr is height."
               do
               (if (symbolp i)
                   (let* ((label-name (symbol-name i)))
-                    (wlf:acond
+                    (cond
                      ((string-match ":\\(left\\|upper\\)-" label-name)
                       (setq label-name
                             (concat ":" (substring label-name (match-end 0))))
@@ -533,11 +533,13 @@ layout. See the comment of `wlf:layout' function for arguments."
   "Define local variables: recipe, winfo-list, wholep, layout-hook."
   (declare (debug (symbolp &rest form))
            (indent 1))
+  (ignore wset)
   `(let* 
        ((recipe (wlf:wset-recipe wset))
         (winfo-list (wlf:wset-winfo-list wset))
         (wholep (wlf:wset-wholep wset))
         (layout-hook (wlf:wset-layout-hook wset)))
+     (ignore layout-hook)
      ,@body))
 
 (defun wlf:layout-internal (wset &optional restore-window-size)
@@ -669,7 +671,7 @@ name or object to show in the window."
           (wlf:get-winfo 
            winfo-name (wlf:wset-winfo-list wset)))
          (window (wlf:window-live-window winfo))
-         (curwin (selected-window)))
+         (_curwin (selected-window)))
     (unless (buffer-live-p buf)
       (error "Buffer is dead. at wlf:set-buffer. (%s)" winfo-name))
     (plist-put (wlf:window-options winfo) :buffer buf)
@@ -821,7 +823,7 @@ It returns WINDOW by given name."
     (cond
      ((= die-count 0) t)
      (t (cl-loop for winfo in (wlf:wset-winfo-list wset)
-              for (left top right bottom) = (wlf:window-edges winfo)
+              for (left top _right _bottom) = (wlf:window-edges winfo)
               for sw = (window-at left top)
               with windows = nil
               do
