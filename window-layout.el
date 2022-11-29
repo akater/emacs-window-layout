@@ -3,7 +3,7 @@
 ;; Copyright (C) 2010-2017  SAKURAI Masashi
 
 ;; Author: SAKURAI Masashi <m.sakurai atmark kiwanami.net>
-;; Version: 1.4
+;; Version: 1.5
 ;; Keywords: window, layout
 
 ;; This program is free software; you can redistribute it and/or modify
